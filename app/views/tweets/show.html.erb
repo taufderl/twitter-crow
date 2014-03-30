@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Created at:</strong>
+  <%= @tweet.created_at %>
+</p>
+
+<p>
+  <strong>Text:</strong>
+  <%= @tweet.text %>
+</p>
+
+<p>
+  <strong>Screen name:</strong>
+  <%= @tweet.screen_name %>
+</p>
+
+<p>
+  <strong>Geo longitude:</strong>
+  <%= @tweet.geo_longitude %>
+</p>
+
+<p>
+  <strong>Geo latitude:</strong>
+  <%= @tweet.geo_latitude %>
+</p>
+
+<%= link_to 'Edit', edit_tweet_path(@tweet) %> |
+<%= link_to 'Back', tweets_path %>

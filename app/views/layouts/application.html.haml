@@ -1,0 +1,36 @@
+!!!
+%html
+  %head
+    %title TwitterCrow
+    = stylesheet_link_tag "application", media: "all", "data-turbolinks-track" => true
+    = javascript_include_tag "application", "data-turbolinks-track" => true
+    = csrf_meta_tags
+
+  %body
+    .container#wrap
+      .row
+        %img.img-responsive{src: image_path('header.png')}
+      .row
+        - flash.each do |name, msg|
+          = content_tag :div, msg, class: name
+
+      .row
+        =yield
+
+    .footer
+      .container
+        .col-md-6
+          -if current_page?('/')
+            %p
+              %a.btn.btn-xs.btn-info{href: about_path}
+                %span.glyphicon.glyphicon-question-sign
+                How does it work?
+              
+              - if current_user
+                %a.btn.btn-xs.btn-danger{href: user_path(current_user), 'data-method' => 'delete'}
+                  %span.glyphicon.glyphicon-trash
+                  Delete all my data
+        .col-md-6
+          %p.copyright.pull-right
+            &copy; Tim auf der Landwehr 2014 - <a href="http://taufderl.de">taufderl.de</a>
+

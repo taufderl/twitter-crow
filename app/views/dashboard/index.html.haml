@@ -1,0 +1,35 @@
+.col-md-5#retrieve-tweets-div
+  .well
+    .input-group
+      %span.input-group-addon @
+      %input.form-control#username-field{placeholder: 'Username', :disabled => true, value: @user.name}
+      %span.input-group-btn
+        %button.btn.btn-primary#retrieve-tweets-button 
+          %span.glyphicon.glyphicon-refresh
+          Refresh
+    
+    = render partial: 'progress_bars'
+            
+    #tweet-generator
+      .page-header
+        %p#generation-explanation
+      .input-group
+        %button.btn.btn-success.center#generate-tweet-button
+          %span.glyphicon.glyphicon-asterisk
+          Generate Tweet
+
+  .well#generated-tweet-div{hidden: true}
+    %p#generated-tweet
+    .buttons
+      .pull-right
+        %button.btn.btn.btn-success#thumbs-up-button
+          %span.glyphicon.glyphicon-thumbs-up
+        %button.btn.btn.btn-warning#thumbs-down-button
+          %span.glyphicon.glyphicon-thumbs-down
+      
+  
+.col-md-7
+  #tweet-map
+    .map.well#map{style: 'width: 660px; height: 400px;'}
+      
+    

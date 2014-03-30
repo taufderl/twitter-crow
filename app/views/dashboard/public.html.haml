@@ -1,0 +1,15 @@
+.jumbotron
+  %p This is a software intended to generate your future Tweets. Try it now!
+  %br
+  .col-md-5.col-md-offset-3
+    .input-group
+      %span.input-group-addon @
+      %input.form-control#username-field{placeholder: 'Username', :autofocus => true}
+      %span.input-group-btn
+        %button.btn.btn-primary#retrieve-tweets-button 
+          Let's go
+          %span.glyphicon.glyphicon-arrow-right
+          
+  %br
+  %br
+  = render partial: 'progress_bars'
