@@ -9,6 +9,7 @@
  * compiled file, but it's generally better to create a new file per style scope.
  *
  *= require_self
+ *= require jquery.spin
  *= require_tree .
  */
 @import "bootstrap";
@@ -23,6 +24,18 @@ body {
 }
 
 .footer {
-  heigth: 60px;
+  height: 60px;
   padding-top: 20px;
+}
+
+.spin {
+
+  > *
+  {
+    background: #FFF; /* hand */
+  }
+}
+
+.arrow {
+  padding-right: 5px;
 }

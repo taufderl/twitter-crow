@@ -1,8 +1,15 @@
-class TweetImporterWorker
+class NearbyTweetsImporterWorker
   include Sidekiq::Worker
   include Sidekiq::Status::Worker
   
   sidekiq_options retry: false
+  
+  @client = Twitter::REST::Client.new do |config|
+    config.consumer_key        = ENV["TWITTER_CONSUMER_KEY"]
+    config.consumer_secret     = ENV["TWITTER_CONSUMER_SECRET"]
+    config.access_token        = ENV["TWITTER_ACCESS_TOKEN"]
+    config.access_token_secret = ENV["TWITTER_ACCESS_SECRET"]
+  end
   
   def perform(user_id)
     at 0, 100, 'starting'
@@ -13,10 +20,8 @@ class TweetImporterWorker
     else
       user.tweets_updated = Time.now
       # update tweets and safe user
-      at 10, 100, 'fetching tweets...'
+      at 10, 100, "fetching user's tweets..."
       retrieved_tweets = fetch_all_tweets(user.name)
-      
-      #puts retrieved_tweets
       
       at 70, 100, 'processing Tweets...'
       new_tweets = []
@@ -55,13 +60,6 @@ class TweetImporterWorker
   end
   
   def fetch_all_tweets(user)
-    @client = Twitter::REST::Client.new do |config|
-      config.consumer_key        = ENV["TWITTER_CONSUMER_KEY"]
-      config.consumer_secret     = ENV["TWITTER_CONSUMER_SECRET"]
-      config.access_token        = ENV["TWITTER_ACCESS_TOKEN"]
-      config.access_token_secret = ENV["TWITTER_ACCESS_SECRET"]
-    end
-  
     begin
       collect_with_max_id do |max_id|
         options = {:count => 200, :include_rts => true}

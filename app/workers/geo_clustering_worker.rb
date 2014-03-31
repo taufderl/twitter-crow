@@ -63,7 +63,8 @@ class GeoClusteringWorker
     size = @new_points.length
     for point, index in @new_points.each_with_index
       # add at thing here for number of points
-      at (index/size*90).to_i, 100, "point #{index} of #{size}"
+      i = (index/size*90).to_i
+      at i, 100, "point #{index} of #{size}"
       if not point.visited
         point.visited = true
         neighbours = immediate_neighbours(point)

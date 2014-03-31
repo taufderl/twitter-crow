@@ -3,14 +3,21 @@ class AjaxController < ApplicationController
   require 'marky_markov'
   
   # starts a worker to crawl the twitter tweets
-  def crawl_tweets
+  def crawl_user_tweets
+    # TODO: check current_user!!
     username = params[:username]
     if not user = User.find_by(name: username)
       user = User.new(name: username)
       user.save
     end
     session[:user_id] = user.id #sets current user
-    job_id = TweetImporterWorker.perform_async(user.id)
+    job_id = UserTweetsImporterWorker.perform_async(user.id)
+    render text: job_id
+  end
+  
+  # starts a worker to crawl the nearby tweets
+  def crawl_nearby_tweets
+    job_id = NearbyTweetsImporterWorker.perform_async(current_user.id)
     render text: job_id
   end
   
@@ -125,15 +132,17 @@ class AjaxController < ApplicationController
   end
   
   def generate_next_tweet
-    length = rand(7) + 3
-    
     markov = MarkyMarkov::Dictionary.new(current_user.dictionary)
-    new_tweet = markov.generate_n_words length
+    new_tweet = markov.generate_n_sentences 1
     
     render text: new_tweet
   end
   
   def reset_session
-    redirect_to user_path(current_user.id), method: :delete
+    @user = current_user
+    #reset_session
+    @user.destroy
+    #redirect_to user_path(current_user.id), method: :delete
+    redirect_to root_path
   end
 end

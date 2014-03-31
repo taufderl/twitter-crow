@@ -1,12 +1,9 @@
-# Place all the behaviors and hooks related to the matching controller here.
-# All this logic will automatically be available in application.js.
-# You can use CoffeeScript in this file: http://coffeescript.org/
 
 # define Tweet popup
 getPopupDiv = (tweet) ->
   div = $("<div class='popup'>")
   content = $("<div class='popup-content'>")
-  content.append($("<p><b>" + tweet.attributes.screen_name + ":</b><br />" + tweet.attributes.text + "</p>"))
+  content.append($("<p><b>@" + tweet.attributes.screen_name + "</b> ("+tweet.attributes.created_at + "):<br />"+ tweet.attributes.text + "</p>"))
   content.append($("<p>" + tweet.attributes.latitude + "," + tweet.attributes.longitude + "</p>"))
   content.append($("<p>Cluster: " + tweet.attributes.cluster + "</p>"))
   content.append($("<p><a href='http://twitter.com/"+tweet.attributes.screen_name+"/statuses/" + tweet.attributes.id + "' target='_blank'>Link to Tweet</b></p>"))
@@ -19,7 +16,7 @@ COLORS = ["#99CCFF",  "#99CCCC", "#99CC99", "#99CC66", "#99CC33", "#99CC00",
         
 getClusterColor = (cluster) ->
   if cluster == -1
-    return 'black'
+    return 'white'
   else if cluster < COLORS.length
     return COLORS[cluster]
   else  # if not enough colors for cluster make it red
@@ -33,10 +30,10 @@ MERCATOR = new OpenLayers.Projection('EPSG:900913')
 (exports ? this).renderTweetMap = ->
   $('#map').empty()
   console.log "render tweet map"
+  
   # add marker to map when current location is determined
   addCurrentPositionToMap = ->
-    #console.log location.coords
-    console.log "addLocationToMap"
+    #console.log "addLocationToMap"
     $.ajax(url: "/get_current_location").done (location) ->
       if location != null
         console.log(location)
@@ -72,7 +69,6 @@ MERCATOR = new OpenLayers.Projection('EPSG:900913')
   $.ajax(url: "/get_tweets").done (received_tweets) ->
     #console.log received_tweets
     for tweet in received_tweets
-      #console.log tweet
       
       if tweet.geo_enabled == true 
         latitude = parseFloat(tweet.geo_latitude)
@@ -85,7 +81,8 @@ MERCATOR = new OpenLayers.Projection('EPSG:900913')
           id: tweet.id,
           cluster: tweet.cluster,
           screen_name: tweet.screen_name
-          color: getClusterColor(tweet.cluster)
+          color: getClusterColor(tweet.cluster),
+          created_at: tweet.created_at
         }
         
         point = new OpenLayers.Geometry.Point(longitude, latitude).transform(WGS84, MERCATOR)

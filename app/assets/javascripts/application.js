@@ -16,6 +16,7 @@
 //= require turbolinks
 //= require bootstrap
 //= require openlayers/OpenLayers
+//= require jquery.spin
 //= require_tree .
 
 OpenLayers._getScriptLocation = function(){ return '/assets/openlayers/'; };

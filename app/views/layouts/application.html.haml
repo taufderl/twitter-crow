@@ -7,7 +7,7 @@
     = csrf_meta_tags
 
   %body
-    .container#wrap
+    .container
       .row
         %img.img-responsive{src: image_path('header.png')}
       .row
@@ -27,10 +27,16 @@
                 How does it work?
               
               - if current_user
-                %a.btn.btn-xs.btn-danger{href: user_path(current_user), 'data-method' => 'delete'}
+                %a.btn.btn-xs.btn-danger{href: reset_session_path}
                   %span.glyphicon.glyphicon-trash
                   Delete all my data
         .col-md-6
-          %p.copyright.pull-right
-            &copy; Tim auf der Landwehr 2014 - <a href="http://taufderl.de">taufderl.de</a>
+          %span.pull-right>
+            %p
+              %a.btn.btn-xs.btn-default{href: 'http://taufderl.de'}
+                %span.glyphicon.glyphicon-copyright-mark
+                Tim auf der Landwehr 2014
+              %a.btn.btn-xs.btn-default{href: 'https://github.com/taufderl/twitter-crow'}
+                %span.glyphicon.glyphicon-folder-open
+                Code on GitHub
 

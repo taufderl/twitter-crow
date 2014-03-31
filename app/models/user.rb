@@ -3,7 +3,7 @@ class User < ActiveRecord::Base
   TIMEOUT_TWEET_RELOAD = 1000
   TIMEOUT_GEO_CLUSTERING = 100
 
-  has_many :tweets, dependent: :delete_all
+  has_many :tweets, dependent: :destroy
   
   def dictionary
     "#{id}"

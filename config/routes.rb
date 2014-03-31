@@ -1,8 +1,8 @@
 TwitterCrow::Application.routes.draw do
   
-  
   #AJAX PATHS
-  get 'crawl_tweets' => "ajax#crawl_tweets"
+  get 'crawl_user_tweets' => "ajax#crawl_user_tweets"
+  get 'crawl_nearby_tweets' => "ajax#crawl_nearby_tweets"
   get 'run_geoclustering' => "ajax#run_geoclustering"
   get 'run_language_modeling' => "ajax#run_language_modeling"
   get 'worker_status' => "ajax#worker_status"
@@ -15,19 +15,14 @@ TwitterCrow::Application.routes.draw do
   get 'get_current_location' => "ajax#get_current_location"
   post 'set_current_cluster' => "ajax#set_current_cluster"
   
-  delete 'reset_session' => "ajax#reset_session"
+  get 'reset_session' => "ajax#reset_session"
   
   get 'generation_explanation' => "ajax#generation_explanation"
   
   get 'generate_next_tweet' => 'ajax#generate_next_tweet'
   
-  
-  
   root "dashboard#index"
   get 'about' => "dashboard#about"
-  
-  resources :users
-  resources :tweets
   
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'

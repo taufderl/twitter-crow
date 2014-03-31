@@ -4,11 +4,11 @@
       %span.input-group-addon @
       %input.form-control#username-field{placeholder: 'Username', :disabled => true, value: @user.name}
       %span.input-group-btn
-        %button.btn.btn-primary#retrieve-tweets-button 
+        %button.btn.btn-primary#update-tweets-button 
           %span.glyphicon.glyphicon-refresh
           Refresh
     
-    = render partial: 'progress_bars'
+    = render partial: 'progress'
             
     #tweet-generator
       .page-header
