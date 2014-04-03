@@ -8,16 +8,31 @@ class LanguageModelWorker
     current_cluster = parameters['current_cluster']
 
     user = User.find(user_id)
+    
+    # make sure the new dictionary is empty 
+    MarkyMarkov::Dictionary.delete_dictionary!(user.dictionary)
     markov = MarkyMarkov::Dictionary.new(user.dictionary)
     
+    # parse all the tweets of the current cluster
     clustered_tweets = user.clustered_tweets
     tweets = user.tweets_in_cluster current_cluster
     
     tweets.each do |tweet|
-      markov.parse_string tweet.text
+      # parse tweet
+      user_tweets_weight = Setting.get('model.user_tweets_weight')
+      user_tweets_weight.times do
+        markov.parse_string tweet.text
+      end
     end
     
-    puts markov.inspect
+    # parse all the tweets of the current cluster
+    File.open(user.id.to_s+'_nearby.tweets', 'r').each do |line|
+      nearby_tweets_weight = Setting.get('model.nearby_tweets_weight')
+      nearby_tweets_weight.times do
+        markov.parse_string line.strip
+      end
+    end
+    
     markov.save_dictionary!
     
     at 100, 100, 'finished!'

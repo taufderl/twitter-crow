@@ -1,5 +1,7 @@
 TwitterCrow::Application.routes.draw do
   
+  resources :settings
+
   #AJAX PATHS
   get 'crawl_user_tweets' => "ajax#crawl_user_tweets"
   get 'crawl_nearby_tweets' => "ajax#crawl_nearby_tweets"

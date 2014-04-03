@@ -37,17 +37,48 @@ MERCATOR = new OpenLayers.Projection('EPSG:900913')
     $.ajax(url: "/get_current_location").done (location) ->
       if location != null
         console.log(location)
-        size = new OpenLayers.Size(21,25)
-        offset = new OpenLayers.Pixel(-(size.w/2), -size.h)
-        icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png', size, offset)
-        position = new OpenLayers.LonLat(location.lon, location.lat).transform(WGS84, MERCATOR)
-        locationMarker = new OpenLayers.Layer.Markers( "LocationMarker" )
-        locationMarker.addMarker(new OpenLayers.Marker(position,icon.clone()))
-        current_boundary = map.getExtent()
-        current_boundary.extend(locationMarker.getDataExtent)
-        map.zoomToExtent(current_boundary)
-        map.addLayer(locationMarker)
-    
+
+        # create location Layer vector based -------->
+        locationStyle = OpenLayers.Util.extend({
+            externalGraphic : "/assets/marker.png",
+            pointRadius     : 12
+            })
+        locationLayer = new OpenLayers.Layer.Vector("LocationLayer", { style: locationStyle })
+        point = new OpenLayers.Geometry.Point(location.lon, location.lat).transform(WGS84, MERCATOR)
+        feature = new OpenLayers.Feature.Vector(point, { icon: "icon.png" })
+        locationLayer.addFeatures([feature]);
+        map.addLayer(locationLayer)
+        # <----------- Vector based new layer
+        
+        # select control to switch layers
+        map.addControl(new OpenLayers.Control.LayerSwitcher());
+        selectControl = new OpenLayers.Control.SelectFeature(
+            [featureLayer, locationLayer]
+        );
+        map.addControl(selectControl);
+        selectControl.activate();
+        
+        # drag control
+        dragLocation = new OpenLayers.Control.DragFeature(locationLayer,{
+              # store new location in session when dragged the tile
+              'onComplete': (feature, pixel) ->
+                        newLocation = map.getLonLatFromViewPortPx(pixel).transform(MERCATOR, WGS84)
+                        console.log('onComplete dragged to:'+newLocation)
+                        console.log "setLocationInSession"
+                        console.log(newLocation.lat+" "+newLocation.lon)
+                        location = {latitude: newLocation.lat, longitude: newLocation.lon}
+                        $.ajax(url: '/set_current_location', type: 'POST', data: location).done (answer) ->
+                          console.log answer
+              })
+        map.addControl(dragLocation)
+        dragLocation.activate()
+        
+        map.events.register("click", map, (e) ->
+            opx = map.getLayerPxFromViewPortPx(e.xy)
+            lonlat = map.getLonLatFromPixel(opx)
+            console.log(lonlat)
+        )
+
   # create map and add map layer
   map = new OpenLayers.Map('map') # Argument is the name of the containing div.
   map.addLayer(new OpenLayers.Layer.OSM())        # add map layer
@@ -116,6 +147,6 @@ MERCATOR = new OpenLayers.Projection('EPSG:900913')
             tweet.popup.destroy();
             tweet.popup = null;
     })
-    
+        
     addCurrentPositionToMap()  
 

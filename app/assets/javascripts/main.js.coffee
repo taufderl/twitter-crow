@@ -134,7 +134,6 @@ getNextGeneratedTweet = ->
     $("#generated-tweet").html next_tweet
     $("#generated-tweet-div").show()
       
-
 storeCurrentClusterInSession = (current_cluster) ->
   $.ajax(url: '/set_current_cluster', type: 'POST', data: {'current_cluster': current_cluster}).done (answer) ->
     console.log answer

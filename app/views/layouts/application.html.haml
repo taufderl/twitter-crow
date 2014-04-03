@@ -5,6 +5,7 @@
     = stylesheet_link_tag "application", media: "all", "data-turbolinks-track" => true
     = javascript_include_tag "application", "data-turbolinks-track" => true
     = csrf_meta_tags
+    = favicon_link_tag 'favicon.png'
 
   %body
     .container
@@ -30,9 +31,17 @@
                 %a.btn.btn-xs.btn-danger{href: reset_session_path}
                   %span.glyphicon.glyphicon-trash
                   Delete all my data
+          -elsif current_page? controller: :settings
+            %a.btn.btn-xs.btn-primary{href: '/'}
+              %span.glyphicon.glyphicon-arrow-left
+              Back to Main Page
         .col-md-6
           %span.pull-right>
             %p
+              - if !current_page? controller: :settings
+                %a.btn.btn-xs.btn-default{href: '/settings'}
+                  %span.glyphicon.glyphicon-wrench
+                  Parameters
               %a.btn.btn-xs.btn-default{href: 'http://taufderl.de'}
                 %span.glyphicon.glyphicon-copyright-mark
                 Tim auf der Landwehr 2014

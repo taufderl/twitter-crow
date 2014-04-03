@@ -1,0 +1,15 @@
+%p 
+  Found geodata in
+  %span.badge= @geo_tweets
+  out of
+  %span.badge= @total_tweets
+  tweets
+        
+%p
+  Selected
+  %span.badge= @tweets_in_current_cluster
+  tweets from cluster #{@current_cluster}
+%p
+  Using 
+  %span.badge= @nearby_tweets
+  tweets from nearby

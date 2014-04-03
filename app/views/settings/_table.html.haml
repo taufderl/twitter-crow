@@ -1,0 +1,15 @@
+%table.table.table.condensed.table-active
+  %tr
+    %th key
+    %th description
+    %th type
+    %th value
+    %th= link_to 'New', new_setting_path, class: 'btn btn-xs btn-default'
+
+  - @settings.each do |setting|
+    %tr
+      %td= setting.key
+      %td= setting.description
+      %td= setting.type
+      %td= setting.value
+      %td= link_to 'Edit', edit_setting_path(setting), class: 'btn btn-xs btn-default'

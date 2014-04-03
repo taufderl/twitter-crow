@@ -13,7 +13,11 @@ class GeoClusteringWorker
     data_hash[0] = current_location
     
     at 1, 100, 'running DBScan...'
-    results = dbscan(data_hash,0.05,1)
+    epsilon = Setting.get('dbscan.epsilon')
+    min_points = Setting.get('dbscan.min_points')
+    puts "Using epsilon=#{epsilon} and min_points=#{min_points}"
+    
+    results = dbscan(data_hash,epsilon,min_points)
     
     n_clusters = results.size-1 # subtract one for noise (cluster -1)
     

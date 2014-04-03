@@ -17,7 +17,12 @@ class AjaxController < ApplicationController
   
   # starts a worker to crawl the nearby tweets
   def crawl_nearby_tweets
-    job_id = NearbyTweetsImporterWorker.perform_async(current_user.id)
+    if session[:current_location]
+      current_location = session[:current_location].values
+    else
+      current_location = [0,0]
+    end
+    job_id = NearbyTweetsImporterWorker.perform_async({'user_id' => current_user.id, 'current_location' => current_location})
     render text: job_id
   end
   
@@ -118,31 +123,26 @@ class AjaxController < ApplicationController
   end
   
   def generation_explanation
-    no_all = current_user.tweets.count
-    tweets = current_user.tweets_with_geo
-    no_with_geo = tweets.count
-    
-    tweets_in_current_cluster = current_user.tweets_in_cluster(session[:current_cluster])
-    
-    html = "Total tweets: <span class='badge'>#{no_all}</span><br />
-            With Geodata: <span class='badge'>#{no_with_geo}</span><br />
-            In current cluster: <span class='badge'>#{tweets_in_current_cluster.count}</span>"
-
-    render text: html
+    @total_tweets = current_user.tweets.count
+    @geo_tweets = current_user.tweets_with_geo.count
+    @current_cluster = session[:current_cluster]
+    @tweets_in_current_cluster = current_user.tweets_in_cluster(@current_cluster).count
+ 
+ 
+    lines = File.open(current_user.id.to_s+'_nearby.tweets', 'r').readlines()
+    @nearby_tweets = lines.count
   end
   
   def generate_next_tweet
     markov = MarkyMarkov::Dictionary.new(current_user.dictionary)
-    new_tweet = markov.generate_n_sentences 1
+    new_tweet = markov.generate_n_words 10
     
     render text: new_tweet
   end
   
   def reset_session
-    @user = current_user
-    #reset_session
-    @user.destroy
-    #redirect_to user_path(current_user.id), method: :delete
+    DeleteUserDataWorker.perform_async(current_user.id)
+    session[:user_id] = nil
     redirect_to root_path
   end
 end
