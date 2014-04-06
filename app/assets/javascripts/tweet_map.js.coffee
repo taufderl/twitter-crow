@@ -63,12 +63,9 @@ MERCATOR = new OpenLayers.Projection('EPSG:900913')
               # store new location in session when dragged the tile
               'onComplete': (feature, pixel) ->
                         newLocation = map.getLonLatFromViewPortPx(pixel).transform(MERCATOR, WGS84)
-                        console.log('onComplete dragged to:'+newLocation)
-                        console.log "setLocationInSession"
-                        console.log(newLocation.lat+" "+newLocation.lon)
                         location = {latitude: newLocation.lat, longitude: newLocation.lon}
                         $.ajax(url: '/set_current_location', type: 'POST', data: location).done (answer) ->
-                          console.log answer
+                          console.log("setLocationInSession "+answer)
               })
         map.addControl(dragLocation)
         dragLocation.activate()

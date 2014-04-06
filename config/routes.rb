@@ -14,6 +14,7 @@ TwitterCrow::Application.routes.draw do
   get 'get_tweets_with_geo' => "ajax#get_tweets_with_geo"
   
   post 'set_current_location' => "ajax#set_current_location"
+  post 'set_location' => "ajax#set_location"
   get 'get_current_location' => "ajax#get_current_location"
   post 'set_current_cluster' => "ajax#set_current_cluster"
   

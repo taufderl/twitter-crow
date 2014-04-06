@@ -105,6 +105,20 @@ class AjaxController < ApplicationController
     render json: [longitude, latitude]
   end
   
+  #post
+  def set_location
+    location = params[:location]
+    puts location
+    # TODO: find coordinates for this place
+    # OR: USE IP based approach
+    result = request.location
+    puts result
+    latitude = longitude = 0
+    session[:current_location] = {}
+    session[:current_location][:lat] = latitude
+    session[:current_location][:lon] = longitude
+    render json: [longitude, latitude]
+  end
     
   def get_current_location
     render json: session[:current_location].to_json
@@ -143,6 +157,7 @@ class AjaxController < ApplicationController
   def reset_session
     DeleteUserDataWorker.perform_async(current_user.id)
     session[:user_id] = nil
+    session[:current_cluster] = nil
     redirect_to root_path
   end
 end

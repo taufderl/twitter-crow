@@ -1,0 +1,11 @@
+#set-location-div{hidden: true}
+  %p
+    I was not able to retrieve your current location.
+    In order to generate Tweets you need to tell me where you are. 
+  .input-group
+    %input.form-control#location-field{placeholder: 'Where are you?'}
+    %span.input-group-btn
+      %button.btn.btn-primary#update-tweets-button 
+        %span.glyphicon.glyphicon-map-marker
+        Set location
+  

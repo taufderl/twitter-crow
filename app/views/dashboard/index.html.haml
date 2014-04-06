@@ -8,9 +8,10 @@
           %span.glyphicon.glyphicon-refresh
           Refresh
     
-    = render partial: 'progress'
+    = render partial: 'set_location'
+    = render partial: 'refreshing_location'
             
-    #tweet-generator
+    #tweet-generator{hidden: true}
       .page-headers
         %p#generation-explanation
       .input-group

@@ -1,4 +1,4 @@
-.jumbotron
+.jumbotron.user-input-jumbotron
   %p This is a software intended to generate your future Tweets. Try it now!
   %br
   .col-md-5.col-md-offset-3
@@ -9,6 +9,7 @@
         %button.btn.btn-primary#retrieve-tweets-button 
           Let's go
           %span.glyphicon.glyphicon-arrow-right
-  
+  .col-md-4
   %br
-  = render partial: 'progress'
+  .col-md-5.col-md-offset-3
+    = render partial: 'loading_user_tweets'

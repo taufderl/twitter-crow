@@ -2,26 +2,26 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://coffeescript.org/
 
-refreshUserData = ->
+refreshLocation = ->
   # start all working spins
   $('.spin').spin()
   # hide all status icons before starting
   $('.status-icon').hide()
   $('.status-label').html ''
-  if !onPublicPage()
-    $("#generation-explanation").empty()
-    $("#generated-tweet").empty()
-    $("#generated-tweet-div").hide()
-    $("#tweet-generator").hide()
-  
-  retrieveUserTweets()
+  $("#generation-explanation").empty()
+  $("#generated-tweet").empty()
+  $("#generated-tweet-div").hide()
+  $("#tweet-generator").hide()
+  # show status div
+  $("#refreshing-location-div").show()
+  retrieveNearbyTweets()
 
 retrieveUserTweets = ->
   console.log 'retrieve user tweets'
   $('#retrieve-user-spin').spin('show')
   $('#retrieve-user-arrow').show()
   
-  $("#progress-div").show()
+  $("#loading-tweets-div").show()
   username = $("#username-field").val()
   $.ajax(url: "/crawl_user_tweets", data: {'username': username}).done (job_id) ->
     updateInterval = setInterval -> 
@@ -39,7 +39,7 @@ retrieveUserTweets = ->
           $('#retrieve-user-spin').spin('hide');
           $('#retrieve-user-arrow').hide()
           $('#retrieve-user-ok').show();
-          retrieveNearbyTweets()
+          location.reload()
     , 500
 
 retrieveNearbyTweets = ->
@@ -115,7 +115,7 @@ runLanguageModeling = ->
               location.reload()
             else
               console.log 'render map'
-              $("#progress-div").hide()
+              $("#refreshing-location-div").hide()
               $("#tweet-generator").show()
               renderGenerationExplanation()
               renderTweetMap()
@@ -123,11 +123,19 @@ runLanguageModeling = ->
     , 500
 
 getCurrentPositionAndStoreInSession = ->
-  navigator.geolocation.getCurrentPosition (location) ->
-    console.log "setLocationInSession"
-    $.ajax(url: '/set_current_location', type: 'POST', data: location.coords).done (answer) ->
-      console.log answer
-      
+  navigator.geolocation.getCurrentPosition(setLocationInSession, handleError,
+    {enableHighAccuracy: true, timeout: 5000, maximumAge: 0})
+  
+setLocationInSession = (location) ->
+  console.log "setLocationInSession"
+  $.ajax(url: '/set_current_location', type: 'POST', data: location.coords).done (answer) ->
+    console.log answer
+
+handleError = (err) ->
+  console.log('ERROR')
+  alert("Error occured:"+err)
+  $("#set-location-div").show()
+  
 getNextGeneratedTweet = ->
   $.ajax(url: '/generate_next_tweet').done (next_tweet) ->
     console.log next_tweet
@@ -155,11 +163,10 @@ renderGenerationExplanation = ->
 
 
 
-$ -> # INIT DOCUMENT READY
-  
-  getCurrentPositionAndStoreInSession()
+$ -> # INIT ON DOCUMENT READY
   
   if onPublicPage()
+    # set button handler and Enter key handler
     $("#retrieve-tweets-button").click -> 
         retrieveUserTweets()
     $('#username-field').keydown (event) ->
@@ -167,10 +174,17 @@ $ -> # INIT DOCUMENT READY
         retrieveUserTweets()
     
   else
+    # set button handler
     $("#update-tweets-button").click -> 
-      refreshUserData()
-    $("#tweet-map").show()
-    renderTweetMap()
-    renderGenerationExplanation()
+      refreshLocation()
     $("#generate-tweet-button").click -> 
       getNextGeneratedTweet()
+    
+    # try to retrieve current position and set in session
+    getCurrentPositionAndStoreInSession()
+    
+    # render the Openlayers Map of the users tweets
+    renderTweetMap()
+    # render the information text
+    #renderGenerationExplanation()
+    

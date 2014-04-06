@@ -14,7 +14,7 @@
  */
 @import "bootstrap";
 
-#progress-div {
+#refreshing-location-div, #loading-tweets-div, #set-location-div {
   margin: 20px;
   position: center;
 }
@@ -47,4 +47,8 @@ body {
 
 .table-borderless td {
   border: none;
+}
+
+.user-input-jumbotron {
+  height: 230px;
 }
