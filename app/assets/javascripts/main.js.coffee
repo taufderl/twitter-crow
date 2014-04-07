@@ -1,20 +1,26 @@
 # Place all the behaviors and hooks related to the matching controller here.
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://coffeescript.org/
+global = exports ? this
 
-refreshLocation = ->
-  # start all working spins
-  $('.spin').spin()
-  # hide all status icons before starting
-  $('.status-icon').hide()
-  $('.status-label').html ''
-  $("#generation-explanation").empty()
-  $("#generated-tweet").empty()
-  $("#generated-tweet-div").hide()
-  $("#tweet-generator").hide()
-  # show status div
-  $("#refreshing-location-div").show()
-  retrieveNearbyTweets()
+global.current_position = {lat: 1, lon: 1}
+
+global.updateLocation = ->
+  $.ajax(url: '/set_current_location', type: 'POST', data: global.current_position).done (answer) ->
+    console.log("prepare model for coordinates "+answer)
+    # start all working spins
+    $('.spin').spin()
+    # hide all status icons before starting
+    $('.status-icon').hide()
+    $('.status-label').html ''
+    $("#generation-explanation").empty()
+    $("#generated-tweet").empty()
+    $("#generated-tweet-div").hide()
+    $("#tweet-generator").hide()
+    # show status div
+    $("#refreshing-location-div").show()
+    retrieveNearbyTweets()
+  return global.current_position
 
 retrieveUserTweets = ->
   console.log 'retrieve user tweets'
@@ -122,20 +128,50 @@ runLanguageModeling = ->
           ,1000  
     , 500
 
-getCurrentPositionAndStoreInSession = ->
+getCurrentPositionFromBrowser = (params) ->
+  
+  setLocationInSession = (location) ->
+    coordinates = location.coords
+    global.current_position = {lat: coordinates.latitude, lon: coordinates.longitude}
+    value = global.current_position.lat + "," + global.current_position.lon  
+    $('#location-field').val value
+    updateCurrentLocationOnMap()
+    global.updateLocation()
+
+  hideErrorPopover = ->
+    $("#location-field").popover('hide')
+  
+  showErrorPopover = ->
+    $("#location-field").popover({
+        trigger: 'manual'
+    })
+    $("#location-field").popover('show')
+    $("#location-field").focus(hideErrorPopover)
+  
+  handleError = (err) ->
+    if 'oninit' of params
+      $.ajax(url: '/get_current_location').done (answer) ->
+        if answer != null
+          global.current_position = answer
+          value = global.current_position.lat + "," + global.current_position.lon  
+          $('#location-field').val value
+          updateCurrentLocationOnMap()
+          global.updateLocation()
+        else
+          showErrorPopover()
+    else
+      showErrorPopover()
+      
   navigator.geolocation.getCurrentPosition(setLocationInSession, handleError,
     {enableHighAccuracy: true, timeout: 5000, maximumAge: 0})
-  
-setLocationInSession = (location) ->
-  console.log "setLocationInSession"
-  $.ajax(url: '/set_current_location', type: 'POST', data: location.coords).done (answer) ->
-    console.log answer
 
-handleError = (err) ->
-  console.log('ERROR')
-  alert("Error occured:"+err)
-  $("#set-location-div").show()
-  
+getLocationFromInput = ->
+  location = $('#location-field').val()
+  $.ajax(url: '/search_location', type: 'POST', data: {'location': location}).done (coordinates) ->
+    global.current_position = coordinates
+    updateCurrentLocationOnMap()
+    global.updateLocation()
+
 getNextGeneratedTweet = ->
   $.ajax(url: '/generate_next_tweet').done (next_tweet) ->
     console.log next_tweet
@@ -148,7 +184,7 @@ storeCurrentClusterInSession = (current_cluster) ->
 
 resetSession = ->
   $.ajax(url: '/reset_session').done (answer) ->
-    location.reload() //TODO: remove bars instead of reloading and show error message
+    location.reload() # TODO: remove bars instead of reloading and show error message
     console.log answer
 
 onPublicPage = ->
@@ -176,15 +212,21 @@ $ -> # INIT ON DOCUMENT READY
   else
     # set button handler
     $("#update-tweets-button").click -> 
-      refreshLocation()
+      reloadTweets() # TODO: implement
+      
+    $('#current-position-button').click ->
+      getCurrentPositionFromBrowser({})
     $("#generate-tweet-button").click -> 
       getNextGeneratedTweet()
+    $("#set-location-button").click -> 
+      getLocationFromInput()
+    $('#location-field').keydown (event) ->
+      if (event.keyCode == 13)
+        getLocationFromInput()
     
     # try to retrieve current position and set in session
-    getCurrentPositionAndStoreInSession()
+    getCurrentPositionFromBrowser({oninit: true})
     
     # render the Openlayers Map of the users tweets
     renderTweetMap()
-    # render the information text
-    #renderGenerationExplanation()
     

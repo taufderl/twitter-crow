@@ -1,3 +1,4 @@
+global = exports ? this
 
 # define Tweet popup
 getPopupDiv = (tweet) ->
@@ -22,60 +23,16 @@ getClusterColor = (cluster) ->
   else  # if not enough colors for cluster make it red
     return 'red'
 
-# transformations for coordinates
+# projections for coordinates
 WGS84 = new OpenLayers.Projection('EPSG:4326')
 MERCATOR = new OpenLayers.Projection('EPSG:900913')
 
-  
-(exports ? this).renderTweetMap = ->
+# the initialisation method for the map 
+global.renderTweetMap = ->
   $('#map').empty()
   console.log "render tweet map"
   
-  # add marker to map when current location is determined
-  addCurrentPositionToMap = ->
-    #console.log "addLocationToMap"
-    $.ajax(url: "/get_current_location").done (location) ->
-      if location != null
-        console.log(location)
-
-        # create location Layer vector based -------->
-        locationStyle = OpenLayers.Util.extend({
-            externalGraphic : "/assets/marker.png",
-            pointRadius     : 12
-            })
-        locationLayer = new OpenLayers.Layer.Vector("LocationLayer", { style: locationStyle })
-        point = new OpenLayers.Geometry.Point(location.lon, location.lat).transform(WGS84, MERCATOR)
-        feature = new OpenLayers.Feature.Vector(point, { icon: "icon.png" })
-        locationLayer.addFeatures([feature]);
-        map.addLayer(locationLayer)
-        # <----------- Vector based new layer
-        
-        # select control to switch layers
-        map.addControl(new OpenLayers.Control.LayerSwitcher());
-        selectControl = new OpenLayers.Control.SelectFeature(
-            [featureLayer, locationLayer]
-        );
-        map.addControl(selectControl);
-        selectControl.activate();
-        
-        # drag control
-        dragLocation = new OpenLayers.Control.DragFeature(locationLayer,{
-              # store new location in session when dragged the tile
-              'onComplete': (feature, pixel) ->
-                        newLocation = map.getLonLatFromViewPortPx(pixel).transform(MERCATOR, WGS84)
-                        location = {latitude: newLocation.lat, longitude: newLocation.lon}
-                        $.ajax(url: '/set_current_location', type: 'POST', data: location).done (answer) ->
-                          console.log("setLocationInSession "+answer)
-              })
-        map.addControl(dragLocation)
-        dragLocation.activate()
-        
-        map.events.register("click", map, (e) ->
-            opx = map.getLayerPxFromViewPortPx(e.xy)
-            lonlat = map.getLonLatFromPixel(opx)
-            console.log(lonlat)
-        )
-
+  
   # create map and add map layer
   map = new OpenLayers.Map('map') # Argument is the name of the containing div.
   map.addLayer(new OpenLayers.Layer.OSM())        # add map layer
@@ -134,7 +91,7 @@ MERCATOR = new OpenLayers.Projection('EPSG:900913')
             tweet = e.feature;
             html = getPopupDiv(tweet)
             popup = new OpenLayers.Popup.FramedCloud("Tweet", tweet.geometry.getBounds().getCenterLonLat(), null, html, null, true, -> controlSelection.unselect(tweet))
-            popup.minSize = new OpenLayers.Size(300, 100)
+            popup.minSize = new OpenLayers.Size(250, 100)
             tweet.popup = popup
             map.addPopup(popup)
       ,
@@ -144,6 +101,41 @@ MERCATOR = new OpenLayers.Projection('EPSG:900913')
             tweet.popup.destroy();
             tweet.popup = null;
     })
-        
-    addCurrentPositionToMap()  
+    
+    # create location Layer vector based -------->
+    locationStyle = OpenLayers.Util.extend({
+        externalGraphic : "/assets/marker.png",
+        pointRadius     : 12
+        })
+    locationLayer = new OpenLayers.Layer.Vector("LocationLayer", { style: locationStyle })
+    map.addLayer(locationLayer)
+    
+    handleLocationDragged = (feature, pixel) ->
+                    global.current_position = map.getLonLatFromViewPortPx(pixel).transform(MERCATOR, WGS84)
+                    value = global.current_position.lat + "," + global.current_position.lon  
+                    $('#location-field').val value
+                    #global.updateLocation()
+                    
+    # drag control for location
+    dragLocation = new OpenLayers.Control.DragFeature(locationLayer,{
+          # store new location in session when dragged the tile
+          'onComplete': handleLocationDragged 
+          })
+    map.addControl(dragLocation)
+    dragLocation.activate()
+    # <----------- Vector based location layer
+    
+    point = new OpenLayers.Geometry.Point(global.current_position.lon, global.current_position.lat, ).transform(WGS84, MERCATOR)
+    locationFeature = new OpenLayers.Feature.Vector(point, { icon: "icon.png" })
+    locationLayer.addFeatures([locationFeature]);
+  
+    global.updateCurrentLocationOnMap = ->
+      newLonLat = new OpenLayers.LonLat(global.current_position.lon,global.current_position.lat).transform(WGS84, MERCATOR);
+      locationFeature.move(newLonLat)
+  
+    # add select control to switch layers
+    map.addControl(new OpenLayers.Control.LayerSwitcher());
+    selectControl = new OpenLayers.Control.SelectFeature([featureLayer, locationLayer]);
+    map.addControl(selectControl);
+    selectControl.activate();
 

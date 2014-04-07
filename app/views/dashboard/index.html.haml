@@ -6,9 +6,20 @@
       %span.input-group-btn
         %button.btn.btn-primary#update-tweets-button 
           %span.glyphicon.glyphicon-refresh
-          Refresh
+          Refresh Tweets
+    %br
+  
+    .input-group#set-location-div
+      %span.input-group-btn
+        %button.btn.btn-default#current-position-button
+          %span.glyphicon.glyphicon-screenshot
+      %input.form-control#location-field{placeholder: 'Where are you?', 'data-content' => "I was not able to retrieve your current location.\nIn order to generate Tweets you need to tell me where you are.", 'data-placement' =>"bottom", 'rel' => "popover"}
+      %span.input-group-btn
+        %button.btn.btn-primary#set-location-button 
+          %span.glyphicon.glyphicon-map-marker
+          Update location
     
-    = render partial: 'set_location'
+  
     = render partial: 'refreshing_location'
             
     #tweet-generator{hidden: true}
@@ -31,6 +42,6 @@
   
 .col-md-7
   #tweet-map
-    .map.well#map{style: 'width: 660px; height: 400px;'}
+    .map.well#map{style: 'width: 660px; height: 440px;'}
       
     

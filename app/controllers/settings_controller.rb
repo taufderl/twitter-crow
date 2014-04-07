@@ -73,8 +73,4 @@ class SettingsController < ApplicationController
     def setting_params
       params[:setting].permit(:key, :description, :value, :type)
     end
-    
-    def restrict
-      
-    end
 end

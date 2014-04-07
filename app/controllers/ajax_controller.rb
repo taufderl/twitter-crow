@@ -97,8 +97,8 @@ class AjaxController < ApplicationController
   
   #post
   def set_current_location
-    longitude = params[:longitude]
-    latitude = params[:latitude]
+    longitude = params[:lon]
+    latitude = params[:lat]
     session[:current_location] = {}
     session[:current_location][:lat] = latitude
     session[:current_location][:lon] = longitude
@@ -106,18 +106,31 @@ class AjaxController < ApplicationController
   end
   
   #post
-  def set_location
+  def search_location
     location = params[:location]
-    puts location
-    # TODO: find coordinates for this place
-    # OR: USE IP based approach
-    result = request.location
-    puts result
-    latitude = longitude = 0
-    session[:current_location] = {}
-    session[:current_location][:lat] = latitude
-    session[:current_location][:lon] = longitude
-    render json: [longitude, latitude]
+    # try geocoder
+    ip_based_search = false
+    
+    if not location.empty?
+      # find coordinates for the given location name
+      result = Geocoder.search(location)
+      if result.any?
+        latitude = result[0].latitude
+        longitude = result[0].longitude
+      else
+        ip_based_search = true
+      end
+    else
+      ip_based_search = true
+    end
+    
+    if ip_based_search
+      # get location from request IP
+      result = request.location
+      puts result.inspect
+      latitude = longitude = 0
+    end
+    render json: {lon: longitude, lat: latitude}.to_json
   end
     
   def get_current_location
@@ -158,6 +171,9 @@ class AjaxController < ApplicationController
     DeleteUserDataWorker.perform_async(current_user.id)
     session[:user_id] = nil
     session[:current_cluster] = nil
+    session[:current_location] = nil
+    #reset_session
+    current_user = nil
     redirect_to root_path
   end
 end
