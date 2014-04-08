@@ -4,22 +4,18 @@ class GeoClusteringWorker
   sidekiq_options retry: false
   
   def perform(parameters)
+    at 1, 100, 'running DBScan...'
     user_id = parameters['user_id']
-    current_location = parameters['current_location'].map {|v| v.to_f }
-
     user = User.find(user_id)
     
-    data_hash = user.coordinates
-    data_hash[0] = current_location
-    
-    at 1, 100, 'running DBScan...'
+    # get settings
     epsilon = Setting.get('dbscan.epsilon')
     min_points = Setting.get('dbscan.min_points')
     puts "Using epsilon=#{epsilon} and min_points=#{min_points}"
     
-    results = dbscan(data_hash,epsilon,min_points)
+    results = dbscan(user.coordinates,epsilon,min_points)
     
-    n_clusters = results.size-1 # subtract one for noise (cluster -1)
+    n_clusters = results.size-1 # subtract one for noise (cluster -1), NOT TRUE: might not be any noise
     
     at 90, 100, 'applying clusters...'
     Tweet.transaction do

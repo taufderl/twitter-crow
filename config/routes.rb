@@ -1,31 +1,36 @@
 TwitterCrow::Application.routes.draw do
   
+  # main page and about
+  root "dashboard#index"
+  get 'about' => "dashboard#about"
+  
+  # settings pages
   resources :settings
 
-  #AJAX PATHS
+  # --- AJAX PATHS ---
+  # workers
   get 'crawl_user_tweets' => "ajax#crawl_user_tweets"
   get 'crawl_nearby_tweets' => "ajax#crawl_nearby_tweets"
   get 'run_geoclustering' => "ajax#run_geoclustering"
   get 'run_language_modeling' => "ajax#run_language_modeling"
   get 'worker_status' => "ajax#worker_status"
-  get 'get_coordinates' => "ajax#get_coordinates"
-  get 'get_clustered_tweets' => "ajax#get_clustered_tweets"
+  # for the map
   get 'get_tweets' => "ajax#get_tweets"
-  get 'get_tweets_with_geo' => "ajax#get_tweets_with_geo"
+  # for the location
+  post 'search_location' => "ajax#search_location"
   
   post 'set_current_location' => "ajax#set_current_location"
-  post 'search_location' => "ajax#search_location"
   get 'get_current_location' => "ajax#get_current_location"
-  post 'set_current_cluster' => "ajax#set_current_cluster"
   
+  
+  
+  
+  # for tweet generation
+  get 'generation_explanation' => "ajax#generation_explanation"
+  get 'generate_next_tweet' => 'ajax#generate_next_tweet'
+  # for logout and sesstion reset
   get 'reset_session' => "ajax#reset_session"
   
-  get 'generation_explanation' => "ajax#generation_explanation"
-  
-  get 'generate_next_tweet' => 'ajax#generate_next_tweet'
-  
-  root "dashboard#index"
-  get 'about' => "dashboard#about"
   
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'

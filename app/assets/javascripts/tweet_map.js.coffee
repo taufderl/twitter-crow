@@ -1,6 +1,7 @@
+# make global namespace available everywhere
 global = exports ? this
 
-# define Tweet popup
+# define the tweet popup on the map
 getPopupDiv = (tweet) ->
   div = $("<div class='popup'>")
   content = $("<div class='popup-content'>")
