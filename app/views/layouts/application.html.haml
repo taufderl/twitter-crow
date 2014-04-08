@@ -28,7 +28,7 @@
                 How does it work?
               
               - if current_user
-                %a.btn.btn-xs.btn-danger{href: reset_session_path, 'data-no-turbolink' => true }
+                %a.btn.btn-xs.btn-danger{href: '/logout', 'data-method' => :delete, 'data-no-turbolink' => true }
                   %span.glyphicon.glyphicon-trash
                   Delete all my data
           -elsif current_page? controller: :settings

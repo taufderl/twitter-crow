@@ -156,15 +156,12 @@ class AjaxController < ApplicationController
   end
   
   # GET
-  # reset session
-  # TODO: make reset_session work!
+  # reset session on error
   def reset_session
     DeleteUserDataWorker.perform_async(current_user.id)
     session[:user_id] = nil
     session[:current_cluster] = nil
     session[:current_location] = nil
-    #reset_session
-    current_user = nil
     redirect_to root_path
   end
 end

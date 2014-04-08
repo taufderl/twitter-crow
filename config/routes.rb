@@ -18,18 +18,15 @@ TwitterCrow::Application.routes.draw do
   get 'get_tweets' => "ajax#get_tweets"
   # for the location
   post 'search_location' => "ajax#search_location"
-  
   post 'set_current_location' => "ajax#set_current_location"
   get 'get_current_location' => "ajax#get_current_location"
-  
-  
-  
-  
   # for tweet generation
   get 'generation_explanation' => "ajax#generation_explanation"
   get 'generate_next_tweet' => 'ajax#generate_next_tweet'
   # for logout and sesstion reset
-  get 'reset_session' => "ajax#reset_session"
+  #get 'reset_session' => "ajax#reset_session"
+  delete 'reset_session' => "ajax#reset_session"
+  delete 'logout' => "dashboard#logout"
   
   
   require 'sidekiq/web'
