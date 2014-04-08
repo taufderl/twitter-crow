@@ -4,13 +4,6 @@ class NearbyTweetsImporterWorker
   
   sidekiq_options retry: false
   
-  @client = Twitter::REST::Client.new do |config|
-    config.consumer_key        = ENV["TWITTER_CONSUMER_KEY"]
-    config.consumer_secret     = ENV["TWITTER_CONSUMER_SECRET"]
-    config.access_token        = ENV["TWITTER_ACCESS_TOKEN"]
-    config.access_token_secret = ENV["TWITTER_ACCESS_SECRET"]
-  end
-  
   def perform(parameters)
     user_id = parameters['user_id']
     current_location = parameters['current_location'].map {|v| v.to_f }
@@ -33,8 +26,8 @@ class NearbyTweetsImporterWorker
       config.access_token        = ENV["TWITTER_ACCESS_TOKEN"]
       config.access_token_secret = ENV["TWITTER_ACCESS_SECRET"]
     end
-    radius = '1km'
-    location << radius #TODO: move to global setting
+    radius = Setting.get('nearby_tweets.radius')
+    location << radius
     geocode = location.join(',')
     puts geocode
     
