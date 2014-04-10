@@ -1,6 +1,7 @@
 class UserTweetsImporterWorker
   include Sidekiq::Worker
   include Sidekiq::Status::Worker
+  include TweetImporterHelper
   
   sidekiq_options retry: false
   
@@ -25,10 +26,12 @@ class UserTweetsImporterWorker
         new_tweet.user = user
         new_tweet.created_at = tweet.created_at
         new_tweet.screen_name = tweet.user.username
-        new_tweet.text = tweet.text
-        new_tweet.geo_enabled = true ? tweet.geo?: false
+        new_tweet.geo_enabled = true ? tweet.geo? : false
         new_tweet.geo_latitude = tweet.geo.coordinates[0]
         new_tweet.geo_longitude = tweet.geo.coordinates[1]
+        
+        new_tweet.text = tweet.text
+        new_tweet.text_cleaned = clean_tweet_text(tweet.text)
       end
       
       at 80, 100, 'saving Tweets...'

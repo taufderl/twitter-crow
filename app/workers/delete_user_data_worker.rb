@@ -12,7 +12,7 @@ class DeleteUserDataWorker
     begin
       File.delete(user_id.to_s + '_nearby.tweets')
     rescue
-      pass
+      puts '[WARN] Could not delete nearby tweets file.'
     end
     # finally delete all data in the database
     user.destroy

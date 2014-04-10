@@ -4,6 +4,7 @@ class User < ActiveRecord::Base
   TIMEOUT_GEO_CLUSTERING = 100
 
   has_many :tweets, dependent: :destroy
+  has_one :mutual_information
   
   def dictionary
     "#{id}"

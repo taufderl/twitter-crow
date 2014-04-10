@@ -3,6 +3,7 @@ TwitterCrow::Application.routes.draw do
   # main page and about
   root "dashboard#index"
   get 'about' => "dashboard#about"
+  get 'mi' => "dashboard#mi"
   
   # settings pages
   resources :settings
@@ -24,10 +25,8 @@ TwitterCrow::Application.routes.draw do
   get 'generation_explanation' => "ajax#generation_explanation"
   get 'generate_next_tweet' => 'ajax#generate_next_tweet'
   # for logout and sesstion reset
-  #get 'reset_session' => "ajax#reset_session"
-  delete 'reset_session' => "ajax#reset_session"
+  get 'reset_session' => "ajax#reset_session"
   delete 'logout' => "dashboard#logout"
-  
   
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'

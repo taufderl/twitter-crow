@@ -11,7 +11,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140403162520) do
+ActiveRecord::Schema.define(version: 20140409224226) do
+
+  create_table "mutual_informations", force: true do |t|
+    t.integer  "user_id"
+    t.text     "content"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.float    "total"
+  end
+
+  add_index "mutual_informations", ["user_id"], name: "index_mutual_informations_on_user_id"
 
   create_table "settings", force: true do |t|
     t.datetime "created_at"
@@ -32,6 +42,7 @@ ActiveRecord::Schema.define(version: 20140403162520) do
     t.boolean  "geo_enabled"
     t.integer  "user_id"
     t.integer  "cluster"
+    t.string   "text_cleaned"
   end
 
   add_index "tweets", ["user_id"], name: "index_tweets_on_user_id"

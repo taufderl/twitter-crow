@@ -37,6 +37,10 @@ class GeoClusteringWorker
     user.geo_clustered = Time.now
     #user.current_cluster = current_cluster
     user.save
+    
+    # start mutual information calculation
+    MutualInformationWorker.perform_async({user_id: user.id})
+    
     at 100, 100, 'finished!'
   end
   

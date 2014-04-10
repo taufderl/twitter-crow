@@ -23,9 +23,10 @@ class LanguageModelWorker
     
     
     # parse all users tweets in current cluster
+    # TODO: IMPROVE THIS
     tweets.each do |tweet|
       user_tweets_weight.times do
-        markov.parse_string tweet.text
+        markov.parse_string tweet.text_cleaned
       end
     end
     

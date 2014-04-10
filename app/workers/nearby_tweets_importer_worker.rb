@@ -1,6 +1,7 @@
 class NearbyTweetsImporterWorker
   include Sidekiq::Worker
   include Sidekiq::Status::Worker
+  include TweetImporterHelper
   
   sidekiq_options retry: false
   
@@ -12,7 +13,8 @@ class NearbyTweetsImporterWorker
     filename = user_id.to_s + '_nearby.tweets'
     File.open(filename, 'w') do |file|
       nearby_tweets.each do |t|
-        file.write(t[:text]+"\n")
+        text = clean_tweet_text(t[:text])
+        file.write(text+"\n")
       end  
     end
   end

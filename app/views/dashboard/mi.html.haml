@@ -1,0 +1,29 @@
+.well
+  %p.lead
+    The overall mutual information for your 
+    = @clusters
+    different clusters is
+    %b= @total
+  .col-md-10
+    %p In the following table you can find the highest ranking words for each cluster.
+  .col-md-2
+    %p.pull-right
+      %a.btn.btn-sm.btn-primary{href: '/'} Back to App
+  - @tables.times do |table|
+    %table.table.table-condensed.table-striped.table-bordered
+      %tr
+        - @content[(table*5)..(table*5+4)].each do |cluster, words|
+          %th.col-md-2
+            Cluster
+            = cluster
+        
+        
+      - 10.times do |i|
+        %tr
+          - @content[(table*5)..(table*5+4)].each do |cluster, words|
+            %td
+              = "#{i+1}."
+              %span.badge= words[i][0] if words[i]
+              %br
+              = words[i][1] if words[i]
+              
